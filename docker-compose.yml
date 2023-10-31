@@ -15,7 +15,7 @@ networks:
 services:
   # The Wordpress CMS itself
   wordpress:
-    container_name: "site-exemplo"
+    container_name: "site-exemplo-web"
     image: wordpress:latest
     depends_on:
       - db
@@ -55,6 +55,7 @@ services:
 
   # The MySQL database
   db:
+    container_name: "site-exemplo-db"    
     # this is the database used by Wordpress
     #image: mysql:5.7
     image: mysql:8.0
