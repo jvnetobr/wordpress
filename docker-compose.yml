@@ -1,4 +1,4 @@
-Version: '3'
+version: '3'
 
 # This file is designed to work with Traefik.
 # It is a reverse proxy that is used on the server host several services.
@@ -39,14 +39,12 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       # Get the routes from http
-      #- "traefik.http.routers.wordpressmysite.rule=Host(`${DOMAINE}`)"
       - "traefik.http.routers.site-exemplo.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.site-exemplo.entrypoints=web"
       # Redirect these routes to https
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.site-exemplo.middlewares=redirect-to-https@docker"
       # Get the routes from https
-      #- "traefik.http.routers.wordpressmysite-secured.rule=Host(`${DOMAINE}`)"
       - "traefik.http.routers.site-exemplo-secured.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.site-exemplo-secured.entrypoints=web-secure"
       # Apply autentificiation with http challenge
