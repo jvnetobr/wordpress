@@ -1,22 +1,16 @@
 version: '3'
 
-# This file is designed to work with Traefik.
-# It is a reverse proxy that is used on the server host several services.
-# If you need to dev locally, copy this file under a new name and adapt it.
-# To do so, add the port numbers and remove the tags
-
 networks:
   # enable connection with Traefik
   traefik:
     external: true
   # network for the app
-  apps-network:
+  app-network:
 
 services:
-  # The Wordpress CMS itself
   wordpress:
     container_name: "site-exemplo-web"
-    image: wordpress:latest
+    image: wordpress:php:8.2-fpm-alpine
     depends_on:
       - db
     restart: always
@@ -29,22 +23,26 @@ services:
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
     volumes:
-      # link the content of WordPress in a directory to enable local modifications
-        - ./data:/var/www/html
+      # app files
+      - ./app:/var/www/html
+      - ./app-content:/var/www/html/wp-content
+      - ./app-config.php:/var/www/html/wp-config.php
     networks:
       - traefik
-      - apps-network
+      - app-network
     labels:
       # The labels are usefull for Traefik only
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       # Get the routes from http
+      #- "traefik.http.routers.site-exemplo.rule=Host(`${DOMAIN}`) && PathPrefix(`/DOMAINPATH`)"
       - "traefik.http.routers.site-exemplo.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.site-exemplo.entrypoints=web"
       # Redirect these routes to https
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.site-exemplo.middlewares=redirect-to-https@docker"
       # Get the routes from https
+      #- "traefik.http.routers.site-exemplo-secured.rule=Host(`${DOMAIN}`) && PathPrefix(`/DOMAINPATH`)"
       - "traefik.http.routers.site-exemplo-secured.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.site-exemplo-secured.entrypoints=web-secure"
       # Apply autentificiation with http challenge
@@ -54,7 +52,6 @@ services:
   # The MySQL database
   db:
     container_name: "site-exemplo-db"    
-    # this is the database used by Wordpress
     #image: mysql:5.7
     image: mysql:8.0
     restart: always
@@ -67,51 +64,7 @@ services:
       MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      # Here, the database files are linked into a directory for direct access
-      # You probably prefer to use a docker volume instead
       - ./db:/var/lib/mysql
+      #- ./dump:/dump
     networks:
-      - apps-network
-
-  # Graphical interface to the database
-  # Can be useful for debug  
-  #phpmyadmin:
-  # image: phpmyadmin/phpmyadmin
-  # networks:
-  #   - mysitebackend
-  #   - traefik
-  # depends_on:
-  #   - mysitedb
-  # restart: always
-  # logging:
-  #   # Configure the logs retention according to your needs
-  #   options:
-  #     max-size: "10m"
-  #     max-file: "3"
-  # env_file:
-  #   - ./.env
-  # environment:
-  #   - PMA_ARBITRARY=1
-  #   - PMA_HOST=db
-  #   - PMA_PORT=3306
-  #   - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-  # volumes:
-  #  - /sessions
-  # labels:
-  #   # The labels are usefull for Traefik only
-  #   - "traefik.enable=true"
-  #   - "traefik.docker.network=traefik"
-  #   # Get the data from port xxxx instead of port 80
-  #   # - "traefik.http.services.phpmyadminmysite.loadbalancer.server.port=8081"
-  #    # Get the routes from http
-  #   - "traefik.http.routers.phpmyadminmysite.rule=Host(`${PHPMYADMIN_DOMAIN}`)"
-  #   - "traefik.http.routers.phpmyadminmysite.entrypoints=web"
-  #   # Redirect these routes to https
-  #   - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-  #   - "traefik.http.routers.phpmyadminmysite.middlewares=redirect-to-https@docker"
-  #   # Get the routes from https
-  #   - "traefik.http.routers.phpmyadminmysite-secured.rule=Host(`${PHPMYADMIN_DOMAIN}`)"
-  #     #- "traefik.http.routers.phpmyadminmysite-secured.entrypoints=web-secure"
-  #   # Apply autentificiation with http challenge
-  #   - "traefik.http.routers.phpmyadminmysite-secured.tls=true"
-  #   - "traefik.http.routers.phpmyadminmysite-secured.tls.certresolver=myhttpchallenge"
+      - app-network
