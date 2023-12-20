@@ -63,8 +63,8 @@ services:
     volumes:
       # app files
       - ./app:/var/www/html
-      - ./app-content:/var/www/html/wp-content
-      - ./app-config.php:/var/www/html/wp-config.php
+      #- ./app-content:/var/www/html/wp-content
+      #- ./app-config.php:/var/www/html/wp-config.php
     networks:
       - app-network
 
