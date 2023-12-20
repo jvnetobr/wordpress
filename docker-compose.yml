@@ -10,7 +10,7 @@ networks:
 services:
   wordpress:
     container_name: "site-exemplo-web"
-    image: wordpress:php:8.2-fpm-alpine
+    image: wordpress:php8.3-fpm-alpine
     depends_on:
       - db
     restart: always
