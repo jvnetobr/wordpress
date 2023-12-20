@@ -66,28 +66,8 @@ services:
       - ./app-content:/var/www/html/wp-content
       - ./app-config.php:/var/www/html/wp-config.php
     networks:
-      - traefik
       - app-network
-    labels:
-      # The labels are usefull for Traefik only
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      # Get the routes from http
-      #- "traefik.http.routers.site-exemplo.rule=Host(`${DOMAIN}`) && PathPrefix(`/DOMAINPATH`)"
-      - "traefik.http.routers.site-exemplo.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.site-exemplo.entrypoints=web"
-      # Redirect these routes to https
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.site-exemplo.middlewares=redirect-to-https@docker"
-      # Get the routes from https
-      #- "traefik.http.routers.site-exemplo-secured.rule=Host(`${DOMAIN}`) && PathPrefix(`/DOMAINPATH`)"
-      - "traefik.http.routers.site-exemplo-secured.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.site-exemplo-secured.entrypoints=web-secure"
-      # Apply autentificiation with http challenge
-      - "traefik.http.routers.site-exemplo-secured.tls=true"
-      - "traefik.http.routers.site-exemplo-secured.tls.certresolver=myhttpchallenge"
 
-  # The MySQL database
   db:
     container_name: "site-exemplo-db"    
     #image: mysql:5.7
