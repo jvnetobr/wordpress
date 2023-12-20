@@ -26,7 +26,7 @@ services:
       #- ./app/wp-config.php:/var/www/html/wp-config.php
     networks:
       - traefik
-      - apps-network
+      - app-network
     labels:
       # The labels are usefull for Traefik only
       - "traefik.enable=true"
