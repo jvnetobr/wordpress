@@ -1,2 +1,2 @@
 # nginx + wordpress + php-fpm + traefik 
-Replace "example" with your website domain in the ".env" and "docker-compose.yml" files
+Replace "exemplo.com.br" an "exemplo" with your website domain in the ".env" and "docker-compose.yml" files
